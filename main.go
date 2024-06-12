@@ -1,10 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,13 +25,23 @@ func main() {
 	flag.Parse()
 	listenAddr := fmt.Sprintf("%s:%d", host, port)
 	fmt.Printf("listenAddr: %s\n", listenAddr)
-	hostMap := map[string]string{
-		"docker": "registry.docker.com",
-		"npm":    "registry.npmjs.org",
-		"github": "github.com",
-		"google": "google.com",
-		"baidu":  "baidu.com",
+	jsonFile, err := os.Open("./hostmap.json")
+	if err != nil {
+		log.Fatalf("Error opening JSON file: %v", err)
 	}
+	// 读取文件内容
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		log.Fatalf("Error reading JSON file: %v", err)
+	}
+
+	defer jsonFile.Close()
+	var hostMap map[string]string
+	err = json.Unmarshal(byteValue, &hostMap)
+	if err != nil {
+		log.Fatalf("Error while unmarshalling JSON: %v", err)
+	}
+
 	router := gin.Default()
 	router.Use(func(ctx *gin.Context) {
 		host := ctx.Request.Header.Get("X-Forwarded-Host")
