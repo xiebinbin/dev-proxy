@@ -1,0 +1,7 @@
+{
+    "docker": "registry.docker.com",
+    "npm": "registry.npmjs.org",
+    "github": "github.com",
+    "google": "google.com",
+    "baidu": "baidu.com"
+}
